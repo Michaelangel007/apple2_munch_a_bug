@@ -1,5 +1,11 @@
 # Munch-A-Bug
 
+Diskette:
+
+![Diskette](pics/sds_mab.jpg)
+
+Main menu:
+
 ![Main Screen](pics/main_screen.png)
 
 # Problem
@@ -411,6 +417,15 @@ Asks us to swap disks
 Crashes to monitor due to disk not having binary backup utility.
 
 ![Crash](pics/builtin_backup_4_crash.png)
+
+The BASIC program then calls:
+
+* Calls $26B to initialize the copy and copy Files,
+* asks the user to put the master back in,
+* $2EB to destroy the disk copy binary on the master.
+* Reads the disk copy status from $????
+
+![Crash](pics/builtin_backup_5_fail.png)
 
 ## To fix listing the BASIC file.
 
