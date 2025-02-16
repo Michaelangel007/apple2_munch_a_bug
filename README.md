@@ -1,5 +1,7 @@
 # Munch-A-Bug
 
+![Main Screen](pics/main_screen.png)
+
 # Problem
 
 * Bad sectors on Track $2, Sectors $9, $A, $B
