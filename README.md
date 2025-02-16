@@ -398,7 +398,19 @@ Patch T12,SA on a new disk with the files copied onto it with this 12 byte patch
 
 Next time when you reboot press the `C` key at the `]` Applesoft PROMPT in the lower left.
 
+![Backup Menu](pics/builtin_backup_1.png)
+
+Pressing `1` allows us to select slot & drive:
+
+![Select slot and drive](pics/builtin_backup_2.png)
+
+Asks us to swap disks
+
+![Select slot and drive](pics/builtin_backup_3.png)
+
 Crashes to monitor due to disk not having binary backup utility.
+
+![Crash](pics/builtin_backup_4_crash.png)
 
 ## To fix listing the BASIC file.
 
