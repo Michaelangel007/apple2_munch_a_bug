@@ -432,9 +432,9 @@ R5 ...**..*...........................
 The simpliest way to "defrag" a floppy disk is to copy all the files to a brand new disk.
 
 1. Create new blank disk
-2. Use Copy\]\[+ to copy DOS from the master
+2. Use Copy \]\[+ to copy DOS from the master
 3. Copy files from the master to the copy
-4. Verify files via Copy\]\[+ Disk Map
+4. Verify files via Copy \]\[+ Disk Map
 
 ## Hidden Backup Utility!
 
