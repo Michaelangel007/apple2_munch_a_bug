@@ -535,18 +535,139 @@ Asks us to swap disks
 
 ![Select slot and drive](pics/builtin_backup_3.png)
 
+Lines 1400 and 1490 sets up the drive parameters:
+
+```
+POKE 234,MD     MD = Master Drive (1 or 2)
+POKE 245,MS*16  MS = Master Slot (6*16)
+POKE 236,CD     CD = Copy Drive (1 or 2)
+POKE 237,CS*16  CS = Copy Slot (6*16)
+
+POKE 8,CD     CD = Copy DRIVE
+POKE 9,CS*16  CS = Copy Slot*16
+POKE 12,V     V = Volume Number (254)
+```
+
 Crashes to monitor due to disk not having binary backup utility.
 
 ![Crash](pics/builtin_backup_4_crash.png)
 
-The BASIC program then calls:
+The BASIC program:
 
 * Calls $26B to initialize the copy and copy Files,
-* asks the user to put the master back in,
+* Asks the user to put the master back in,
 * $2EB to destroy the disk copy binary on the master.
 * Reads the disk copy status from $????
 
 ![Crash](pics/builtin_backup_5_fail.png)
+
+## Peeks, Pokes, Pointers, and Privates
+
+The `HELLO` uses these addresses:
+
+* `CALL 619` is $026B (Line 1500)
+* `CALL 646` is $0286 (Line 1660)
+* `CALL 747` is $02EB (Line 1550) -- reads/sets 227
+* `CALL-958` is $FC42 CLREOP
+* `CALL-868` is $FC9C CLREOL
+* `PEEK(175)` End of Applesoft Program Low (Line 1420)
+* `PEEK(176)` End of Applesoft Program High (Line 1420)
+* `C=PEEK(227)` (Line 1550)
+* `POKE 227,0` (Line 1550)
+* `POKE 1012,56` (Reset Vector Checksum $3F4)
+
+## Hidden ML program
+
+The BASIC program `HELLO` has a hidden Machine Language (ML) program at the end!
+
+```
+0f30: 22 3a ba e7 28 34 29 3b 22 46 50 22 3a 80 00 00  "::g(4);"FP":...
+0f40: 00 38 a5 af 85 3e e9 da 85 3c a5 b0 85 3f e9 00  .8%/.>iZ.<%0.?i.
+0f50: 85 3d a9 f1 85 42 a9 02 85 43 a0 00 4c 2c fe a5  .=)q.B)..C .L,~%
+0f60: 68 c9 08 f0 2f a0 01 a5 67 85 08 a5 68 85 09 18  hI.p/ .%g..%h...
+0f70: 90 13 a0 01 b1 08 f0 1c 18 69 28 91 08 a5 06 85  .. .1.p..i(..%..
+0f80: 08 a5 07 85 09 18 b1 08 69 28 85 07 88 b1 08 85  .%....1.i(...1..
+0f90: 06 18 90 de 60 00 a2 ff 86 ee e8 86 1a 86 1b 20  ...^`."..nh.... 
+0fa0: b8 03 20 f7 af a9 b7 38 e9 04 85 19 a9 f3 85 18  8. w/)78i...)s..
+0fb0: a5 1a 85 06 a5 1b 85 07 e6 ee a5 06 0a 0a a8 a5  %...%...fn%...(%
+0fc0: 07 c9 08 b0 01 c8 a5 07 c9 08 b0 07 18 a5 07 69  .I.0.H%.I.0..%.i
+0fd0: 00 90 05 38 a5 07 e9 08 aa b1 18 4a ca 10 fc b0  ...8%.i.*1.JJ.|0
+0fe0: 17 a5 e3 c9 02 f0 0c a5 06 c9 02 d0 06 a5 07 c9  .%cI.p.%.I.P.%.I
+0ff0: 09 b0 03 20 6b 02 e6 0b e6 07 a5 07 c9 10 90 21  .0. k.f.f.%.I..!
+1000: a9 00 85 07 e6 06 a5 06 c9 23 90 15 a5 e3 c9 02  )...f.%.I#..%cI.
+1010: d0 37 a2 b8 86 ff a2 5d 86 fe a5 1d 85 0b 4c 0b  P7"8.."].~%...L.
+1020: 02 a5 0b c5 1f 90 93 d0 06 a5 0a c5 1e 90 8b a5  .%.E...P.%.E...%
+1030: e3 c9 02 d0 14 a5 06 85 1a a5 07 85 1b a5 1d 85  cI.P.%...%...%..
+1040: 0b c6 e3 20 b8 03 4c 0b 03 e6 e3 a5 1d 85 0b a5  .Fc 8.L..fc%...%
+1050: 1a 85 06 a5 1b 85 07 20 c1 03 4c 0b 03 a5 eb 85  ...%... A.L..%k.
+1060: 09 a5 ea 85 08 60 a5 ed 85 09 a5 ec 85 08 60 00  .%j..`%m..%l..`.
+```
+
+The line:
+
+```
+1730  POKE 214,0: POKE 1012,56: PRINT "": PRINT  CHR$ (4);"FP": END
+```
+
+The first 2 bytes on disk of `HELLO` is the file size ($1070). DOS 3.3 loads an Applesoft program to $0801.
+
+This line is stored as:
+
+```
+TrkSec  Disk Byte  Mem   Description
+12 0E / 0000:70    n/a   Size Low
+12 0E / 0001:10    n/a   Size High
+12 0E / 0002:0D 08 0801: Pointer to next line $080D
+12 0E / 0004:20 03 0803: Line 800
+
+:  :    :          :
+13 0F / 0F1C:40 17 171B: Pointer to next line $1740
+13 0F / 0F1E:C2 06 171D: Line 1730
+13 0F   0F20:B9    171F: POKE
+13 0F   0F21:32    1720: 2
+13 0F   0F22:31    1721: 1
+13 0F   0F23:34    1722: 4
+13 0F   0F24:2C    1723: ,
+13 0F / 0F25:30    1724: 0
+13 0F / 0F26:3A    1725: :
+13 0F / 0F27:B9    1726: POKE
+13 0F / 0F28:31    1727: 1
+13 0F / 0F29:30    1728: 0
+13 0F / 0F2A:31    1729: 1
+13 0F / 0F2B:32    172A: 2
+13 0F / 0F2C:2C    172B: ,
+13 0F / 0F2D:35    172C: 5
+13 0F / 0F2E:36    172D: 6
+13 0F / 0F2F:3A    172E: :
+13 0F / 0F30:BA    172F: PRINT
+13 0F / 0F31:22    1730: "
+13 0F / 0F32:22    1731: "
+13 0F / 0F33:3A    1732: :
+13 0F / 0F34:BA    1733: PRINT
+13 0F / 0F35:E7    1734: CHR$
+13 0F / 0F36:28    1735: (
+13 0F / 0F37:34    1736: 4
+13 0F / 0F38:29    1737: )
+13 0F / 0F39:3B    1738: ;
+13 0F / 0F3A:22    1739: "
+13 0F / 0F3B:46    173A: F
+13 0F / 0F3C:50    173B: P
+13 0F / 0F3D:22    173C: "
+13 0F / 0F3E:3A    173D: :
+13 0F / 0F3F:80    173E: END
+13 0F / 0F40:00    173F: end-of-line
+13 0F / 0F41:00 00 1740: null pointer
+13 0F / 0F43:38    1742: SEC        <-- Beginning of helper ML program
+        0F44:A5 AF 1743: LDA PRGEND
+:       :          :
+13 0E / 1070:60    186F: RTS
+```
+
+It might be trigged triggered by this line?
+
+```
+ 1420  CALL  PEEK (175) + 256 *  PEEK (176) - 303
+```
 
 # Other Fixes
 
