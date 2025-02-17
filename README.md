@@ -711,4 +711,13 @@ Apparently the authors thought you shouldn't be looking at the BASIC source. LUL
 
 # Summary
 
+The bad sectors are part of DOS.  They may have been part of a copy protection routine?
+
 Until we find a pristine copy we won't know what the original backup routine was.
+
+We can simply copy the files to a new disk since Track 2 is part of DOS 3.3. (Only the first few sectors are used.)
+
+# TODO
+
+* [ ] File compare with other versions
+* [ ] Compare DOS on M.A.B. with DOS 3.3 (1980)
